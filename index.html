@@ -2,151 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Expense Manager | Dashboard</title>
+  <title>Simple Expense Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
-
-  <!-- Custom CSS -->
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-  <div class="app-shell">
-    <header>
-      <div class="brand">
-        <div class="brand-logo">
-          <span>₹</span>
-        </div>
-        <div class="brand-text">
-          <h1>Expense Manager</h1>
-          <p>Track spending. Stay in control.</p>
-        </div>
+  <div class="app">
+    <h1>Expense Tracker</h1>
+
+    <!-- Form -->
+    <form id="expense-form">
+      <div class="form-row">
+        <label for="date">Date</label>
+        <input type="date" id="date" required />
       </div>
-      <div class="pill">
-        <span class="pill-dot"></span>
-        <span></span>
+
+      <div class="form-row">
+        <label for="description">Description</label>
+        <input type="text" id="description" placeholder="E.g., Lunch, Bus, Recharge" required />
       </div>
-    </header>
 
-    <main>
-      <!-- LEFT UI -->
-      <section class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title"><span class="icon">＋</span> Add Expense</div>
-            <div class="card-subtitle">Input expense details below.</div>
-          </div>
-          <div class="chip">Ctrl + Enter</div>
-        </div>
+      <div class="form-row">
+        <label for="amount">Amount (₹)</label>
+        <input type="number" id="amount" min="1" required />
+      </div>
 
-        <form id="expense-form">
-          <div class="form-group">
-            <label>Date</label>
-            <input type="date" id="date" required />
-          </div>
+      <div class="form-row">
+        <label for="category">Category</label>
+        <select id="category" required>
+          <option value="">Select</option>
+          <option>Food</option>
+          <option>Transport</option>
+          <option>Shopping</option>
+          <option>Bills</option>
+          <option>Entertainment</option>
+          <option>Health</option>
+          <option>Education</option>
+          <option>Other</option>
+        </select>
+      </div>
 
-          <div class="form-group">
-            <label>Description</label>
-            <input type="text" id="description" placeholder="E.g., Uber, Lunch, Recharge" required />
-          </div>
+      <button type="submit" class="btn">Add Expense</button>
+    </form>
 
-          <div class="form-group">
-            <label>Amount (₹)</label>
-            <input type="number" id="amount" min="1" required />
-          </div>
+    <!-- Summary -->
+    <div class="summary">
+      <span>Total Amount:</span>
+      <span id="total-amount">₹0</span>
+    </div>
 
-          <div class="form-group">
-            <label>Category</label>
-            <select id="category" required>
-              <option value="">Select</option>
-              <option>Food</option>
-              <option>Transport</option>
-              <option>Shopping</option>
-              <option>Bills</option>
-              <option>Entertainment</option>
-              <option>Health</option>
-              <option>Education</option>
-              <option>Other</option>
-            </select>
-          </div>
-
-          <button class="btn-primary" type="submit">
-            <span class="icon">💾</span> Add
-          </button>
-        </form>
-
-        <div class="filters-card">
-          <div class="filters-row">
-            <div class="form-group-inline">
-              <label>Search</label>
-              <input id="search" type="text" placeholder="Search..." />
-            </div>
-
-            <div class="form-group-inline">
-              <label>Category</label>
-              <select id="filter-category">
-                <option value="all">All</option>
-                <option>Food</option>
-                <option>Transport</option>
-                <option>Shopping</option>
-                <option>Bills</option>
-                <option>Entertainment</option>
-                <option>Health</option>
-                <option>Education</option>
-                <option>Other</option>
-              </select>
-            </div>
-          </div>
-          <span id="filters-meta">0 items</span>
-        </div>
-      </section>
-
-      <!-- RIGHT UI -->
-      <section class="card table-card">
-        <div class="card-header">
-          <div>
-            <div class="card-title"><span class="icon">📊</span> Summary</div>
-            <div class="card-subtitle">Total spend overview</div>
-          </div>
-        </div>
-
-        <div class="summary-row">
-          <div class="summary-card">
-            <div class="summary-label">Total Spend</div>
-            <div class="summary-value" id="summary-total">₹0</div>
-          </div>
-
-          <div class="summary-card">
-            <div class="summary-label">This Month</div>
-            <div class="summary-value" id="summary-month">₹0</div>
-          </div>
-
-          <div class="summary-card">
-            <div class="summary-label">Top Category</div>
-            <div class="summary-value" id="summary-top-category">–</div>
-          </div>
-        </div>
-
-        <div class="card-header" style="margin-top:12px;">
-          <div class="card-title"><span class="icon">📜</span> Expense History</div>
-          <div class="badge-pill" id="history-count">0 records</div>
-        </div>
-
-        <div id="table-wrapper"></div>
-      </section>
-    </main>
-
-    <footer class="footer">
-      Built using <span class="highilght">HTML + CSS + JavaScript</span> with LocalStorage.
-    </footer>
+    <!-- Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Category</th>
+          <th>Amount (₹)</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="expense-body">
+        <!-- Rows will be added here by JavaScript -->
+      </tbody>
+    </table>
   </div>
-
-  <!-- Toast -->
-  <div class="toast" id="toast"><strong>Error:</strong> <span id="toast-message"></span></div>
 
   <script src="script.js"></script>
 </body>
 </html>
-
