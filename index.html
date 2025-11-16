@@ -2,14 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Expense Manager | Analytics Dashboard</title>
+  <title>Expense Manager | Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
-
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Custom CSS -->
   <link rel="stylesheet" href="style.css" />
@@ -24,76 +21,77 @@
         </div>
         <div class="brand-text">
           <h1>Expense Manager</h1>
-          <p>Track spending. Spot patterns. Stay in control.</p>
+          <p>Track spending. Stay in control.</p>
         </div>
       </div>
       <div class="pill">
         <span class="pill-dot"></span>
-        <span></span>
+        <span>Local data • No backend • HTML/CSS/JS</span>
       </div>
     </header>
 
     <main>
-      <!-- LEFT: Add Expense + Filters -->
+      <!-- LEFT UI -->
       <section class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">
-              <span class="icon">＋</span>
-              New Expense
-            </div>
-            <div class="card-subtitle">Capture your daily expenses with clean, structured inputs.</div>
+            <div class="card-title"><span class="icon">＋</span> Add Expense</div>
+            <div class="card-subtitle">Input expense details below.</div>
           </div>
-          <div class="chip">Ctrl + Enter to add</div>
+          <div class="chip">Ctrl + Enter</div>
         </div>
 
         <form id="expense-form">
           <div class="form-group">
-            <label for="date">Date</label>
+            <label>Date</label>
             <input type="date" id="date" required />
           </div>
+
           <div class="form-group">
-            <label for="description">Description</label>
-            <input type="text" id="description" placeholder="E.g., Zomato, Uber, Electricity bill" required />
+            <label>Description</label>
+            <input type="text" id="description" placeholder="E.g., Uber, Lunch, Recharge" required />
           </div>
+
           <div class="form-group">
-            <label for="amount">Amount (₹)</label>
-            <input type="number" id="amount" step="0.01" min="1" placeholder="E.g., 650" required />
+            <label>Amount (₹)</label>
+            <input type="number" id="amount" min="1" required />
           </div>
+
           <div class="form-group">
-            <label for="category">Category</label>
+            <label>Category</label>
             <select id="category" required>
-              <option value="">Choose category</option>
-              <option>Food & Dining</option>
+              <option value="">Select</option>
+              <option>Food</option>
               <option>Transport</option>
               <option>Shopping</option>
-              <option>Bills & Utilities</option>
+              <option>Bills</option>
               <option>Entertainment</option>
               <option>Health</option>
               <option>Education</option>
               <option>Other</option>
             </select>
           </div>
-          <button type="submit" class="btn-primary">
-            <span class="icon">💾</span>
-            <span>Add expense</span>
+
+          <button class="btn-primary" type="submit">
+            <span class="icon">💾</span> Add
           </button>
         </form>
 
         <div class="filters-card">
           <div class="filters-row">
             <div class="form-group-inline">
-              <label for="search">Search</label>
-              <input id="search" type="text" placeholder="Search by description..." />
+              <label>Search</label>
+              <input id="search" type="text" placeholder="Search..." />
             </div>
+
             <div class="form-group-inline">
-              <label for="filter-category">Filter by Category</label>
+              <label>Category</label>
               <select id="filter-category">
-                <option value="all">All categories</option>
-                <option>Food & Dining</option>
+                <option value="all">All</option>
+                <option>Food</option>
                 <option>Transport</option>
                 <option>Shopping</option>
-                <option>Bills & Utilities</option>
+                <option>Bills</option>
                 <option>Entertainment</option>
                 <option>Health</option>
                 <option>Education</option>
@@ -101,94 +99,53 @@
               </select>
             </div>
           </div>
-          <div class="filters-meta" id="filters-meta">0 items</div>
+          <span id="filters-meta">0 items</span>
         </div>
       </section>
 
-      <!-- RIGHT: Summary + Charts + Table -->
+      <!-- RIGHT UI -->
       <section class="card table-card">
         <div class="card-header">
           <div>
-            <div class="card-title">
-              <span class="icon">📊</span>
-              Analytics & History
-            </div>
-            <div class="card-subtitle">Understand where your money goes with instant insights.</div>
+            <div class="card-title"><span class="icon">📊</span> Summary</div>
+            <div class="card-subtitle">Total spend overview</div>
           </div>
-          <div class="badge">Auto-saved to browser</div>
         </div>
 
         <div class="summary-row">
           <div class="summary-card">
-            <div class="summary-label">Total spend</div>
+            <div class="summary-label">Total Spend</div>
             <div class="summary-value" id="summary-total">₹0</div>
-            <span class="summary-tag summary-tag--green">All time</span>
           </div>
+
           <div class="summary-card">
-            <div class="summary-label">This month</div>
+            <div class="summary-label">This Month</div>
             <div class="summary-value" id="summary-month">₹0</div>
-            <span class="summary-tag summary-tag--blue">Current month</span>
           </div>
+
           <div class="summary-card">
-            <div class="summary-label">Top category</div>
+            <div class="summary-label">Top Category</div>
             <div class="summary-value" id="summary-top-category">–</div>
-            <span class="summary-tag summary-tag--amber">Based on amount</span>
           </div>
         </div>
 
-        <div class="chart-grid">
-          <div class="chart-card">
-            <h4>By category</h4>
-            <div class="chart-wrapper">
-              <canvas id="categoryChart"></canvas>
-            </div>
-          </div>
-          <div class="chart-card">
-            <h4>Monthly trend</h4>
-            <div class="chart-wrapper">
-              <canvas id="monthlyChart"></canvas>
-            </div>
-          </div>
+        <div class="card-header" style="margin-top:12px;">
+          <div class="card-title"><span class="icon">📜</span> Expense History</div>
+          <div class="badge-pill" id="history-count">0 records</div>
         </div>
 
-        <div style="margin-top: 14px;">
-          <div class="card-header" style="margin-bottom: 4px;">
-            <div class="card-title">
-              <span class="icon">📜</span>
-              Expense history
-            </div>
-            <div class="badge-pill badge-pill--category" id="history-count">0 records</div>
-          </div>
-
-          <div id="table-wrapper">
-            <!-- Table will be injected here -->
-          </div>
-        </div>
+        <div id="table-wrapper"></div>
       </section>
     </main>
 
-    <div class="footer">
-      <div>
-        
-      </div>
-      <div class="footer-right">
-        <span></span>
-        <div class="dot-separator"></div>
-        <span></span>
-      </div>
-    </div>
+    <footer class="footer">
+      Built using <span class="highilght">HTML + CSS + JavaScript</span> with LocalStorage.
+    </footer>
   </div>
 
   <!-- Toast -->
-  <div class="toast" id="toast">
-    <div class="toast-indicator"></div>
-    <div class="toast-text">
-      <strong>Check your inputs</strong>
-      <span id="toast-message">Please fill all fields with valid values.</span>
-    </div>
-  </div>
+  <div class="toast" id="toast"><strong>Error:</strong> <span id="toast-message"></span></div>
 
-  <!-- Custom JS -->
   <script src="script.js"></script>
 </body>
 </html>
