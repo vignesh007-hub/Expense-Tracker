@@ -1,135 +1,123 @@
-// Local data storage array
-let expenses = [];
-const STORAGE_KEY = "expense_manager_data";
+// Simple array to store all expenses in memory
+var expenses = [];
 
-// DOM elements
-const form = document.getElementById("expense-form");
-const dateInput = document.getElementById("date");
-const descInput = document.getElementById("description");
-const amountInput = document.getElementById("amount");
-const categoryInput = document.getElementById("category");
-const searchInput = document.getElementById("search");
-const filterCategory = document.getElementById("filter-category");
-const filtersMeta = document.getElementById("filters-meta");
-const summaryTotal = document.getElementById("summary-total");
-const summaryMonth = document.getElementById("summary-month");
-const summaryTopCategory = document.getElementById("summary-top-category");
-const historyCount = document.getElementById("history-count");
-const tableWrapper = document.getElementById("table-wrapper");
-const toast = document.getElementById("toast");
-const toastMsg = document.getElementById("toast-message");
+// Get all important elements from HTML
+var form = document.getElementById("expense-form");
+var dateInput = document.getElementById("date");
+var descInput = document.getElementById("description");
+var amountInput = document.getElementById("amount");
+var categoryInput = document.getElementById("category");
+var tableBody = document.getElementById("expense-body");
+var totalAmountSpan = document.getElementById("total-amount");
 
-// Toast display
-function showToast(msg){
-    toastMsg.textContent = msg;
-    toast.classList.add("show");
-    setTimeout(()=> toast.classList.remove("show"),2200);
-}
+// Listen for form submit (when user clicks "Add Expense")
+form.addEventListener("submit", function (event) {
+  event.preventDefault(); // stop page refresh
 
-// LocalStorage functions
-function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses)); }
-function load(){
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if(Array.isArray(data)) expenses = data;
-}
+  // Get values from inputs
+  var date = dateInput.value;
+  var description = descInput.value;
+  var amount = amountInput.value;
+  var category = categoryInput.value;
 
-// Summary update
-function renderSummary(){
-    const total = expenses.reduce((acc,e)=> acc + Number(e.amount),0);
-    summaryTotal.textContent = "₹" + total;
+  // Basic validation
+  if (date === "" || description === "" || amount === "" || category === "") {
+    alert("Please fill all fields");
+    return;
+  }
 
-    const month = new Date().getMonth();
-    const year = new Date().getFullYear();
-    const monthlyTotal = expenses.filter(e => {
-        const d = new Date(e.date);
-        return d.getMonth() === month && d.getFullYear() === year;
-    }).reduce((acc,e)=> acc + Number(e.amount),0);
-    summaryMonth.textContent = "₹" + monthlyTotal;
+  if (Number(amount) <= 0) {
+    alert("Amount should be greater than 0");
+    return;
+  }
 
-    const categoryTotals = {};
-    expenses.forEach(e => categoryTotals[e.category] = (categoryTotals[e.category] || 0) + Number(e.amount));
-    let top = Object.keys(categoryTotals).sort((a,b)=> categoryTotals[b]-categoryTotals[a])[0] || "–";
-    summaryTopCategory.textContent = top;
-}
+  // Create an expense object
+  var expense = {
+    date: date,
+    description: description,
+    amount: Number(amount),
+    category: category
+  };
 
-// Table render
-function renderTable(){
-    const search = searchInput.value.toLowerCase();
-    const categoryFilter = filterCategory.value;
+  // Add to array
+  expenses.push(expense);
 
-    const filtered = expenses.filter(e =>
-        (categoryFilter === "all" || e.category === categoryFilter) &&
-        e.description.toLowerCase().includes(search)
-    );
+  // Clear inputs
+  descInput.value = "";
+  amountInput.value = "";
+  categoryInput.value = "";
 
-    filtersMeta.textContent = filtered.length + " items";
-    historyCount.textContent = expenses.length + " records";
-
-    if(filtered.length === 0){
-        tableWrapper.innerHTML = `<p style='text-align:center;margin-top:10px;'>No expenses found</p>`;
-        return;
-    }
-
-    let rows = filtered.map(e => `
-        <tr>
-          <td>${e.date}</td>
-          <td>${e.description}</td>
-          <td>${e.category}</td>
-          <td>₹${e.amount}</td>
-          <td><button class="btn-icon" onclick="removeExpense('${e.id}')">Delete</button></td>
-        </tr>
-    `).join("");
-
-    tableWrapper.innerHTML = `
-      <table>
-        <thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Amount</th><th>Action</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    `;
-}
-
-// Remove expense
-function removeExpense(id){
-    expenses = expenses.filter(e => e.id !== id);
-    save();
-    renderAll();
-}
-
-// Form submit
-form.addEventListener("submit",e=>{
-    e.preventDefault();
-    if(!dateInput.value || !descInput.value || !amountInput.value || !categoryInput.value){
-        showToast("Fill all fields!");
-        return;
-    }
-
-    expenses.push({
-        id: Date.now().toString(),
-        date: dateInput.value,
-        description: descInput.value,
-        amount: amountInput.value,
-        category: categoryInput.value
-    });
-
-    descInput.value = "";
-    amountInput.value = "";
-    categoryInput.value = "";
-
-    save();
-    renderAll();
+  // Re-render table and total
+  renderTable();
+  updateTotal();
 });
 
-// Search + Filter
-searchInput.addEventListener("input", renderTable);
-filterCategory.addEventListener("change", renderTable);
-document.addEventListener("keydown", e => { if(e.ctrlKey && e.key === "Enter") form.requestSubmit(); });
+// Function to show all expenses in the table
+function renderTable() {
+  // Clear old rows
+  tableBody.innerHTML = "";
 
-// Render everything
-function renderAll(){
-    renderSummary();
-    renderTable();
+  // Loop through expenses array
+  for (var i = 0; i < expenses.length; i++) {
+    var exp = expenses[i];
+
+    // Create a table row
+    var row = document.createElement("tr");
+
+    // Date cell
+    var dateCell = document.createElement("td");
+    dateCell.textContent = exp.date;
+    row.appendChild(dateCell);
+
+    // Description cell
+    var descCell = document.createElement("td");
+    descCell.textContent = exp.description;
+    row.appendChild(descCell);
+
+    // Category cell
+    var catCell = document.createElement("td");
+    catCell.textContent = exp.category;
+    row.appendChild(catCell);
+
+    // Amount cell
+    var amountCell = document.createElement("td");
+    amountCell.textContent = "₹" + exp.amount;
+    row.appendChild(amountCell);
+
+    // Action cell (delete button)
+    var actionCell = document.createElement("td");
+    var deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+    deleteButton.className = "delete-btn";
+
+    // Add click event to delete this row
+    deleteButton.addEventListener("click", createDeleteHandler(i));
+
+    actionCell.appendChild(deleteButton);
+    row.appendChild(actionCell);
+
+    // Add the row to the table body
+    tableBody.appendChild(row);
+  }
 }
 
-// Initialize
-load();
-renderAll();
+// This function returns a function (closure) that remembers the index
+function createDeleteHandler(index) {
+  return function () {
+    // Remove 1 element at position "index"
+    expenses.splice(index, 1);
+    renderTable();
+    updateTotal();
+  };
+}
+
+// Function to update total amount
+function updateTotal() {
+  var total = 0;
+
+  for (var i = 0; i < expenses.length; i++) {
+    total += expenses[i].amount;
+  }
+
+  totalAmountSpan.textContent = "₹" + total;
+}
